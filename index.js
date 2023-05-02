@@ -1,13 +1,27 @@
 const express = require('express');
 const app = express();
 const generateID = () => Math.random().toString(36).substring(2, 10);
-const PORT = process.env.PORT || 3000;
+
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 const https = require('https').createServer(app);
 const cors = require('cors');
 app.use(cors());
 
+const normalizePort = val => {
+  const port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    return val;
+  }
+  if (port >= 0) {
+    return port;
+  }
+  return false;
+};
+const port = normalizePort(process.env.PORT || '3000');
+
+app.set('port', port);
 const socketIO = require('socket.io')(https, {
   cors: {
     origin: '<http://192.168.18.226:3000>',
@@ -65,6 +79,6 @@ app.get('/', (req, res) => {
     message: 'Hello world',
   });
 });
-https.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
+https.listen(port, () => {
+  console.log(`Server listening on ${port}`);
 });
