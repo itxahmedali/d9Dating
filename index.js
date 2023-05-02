@@ -4,13 +4,13 @@ const generateID = () => Math.random().toString(36).substring(2, 10);
 const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-const http = require('http').Server(app);
+const https = require('https').Server(app);
 const cors = require('cors');
 app.use(cors());
 
-const socketIO = require('socket.io')(http, {
+const socketIO = require('socket.io')(https, {
   cors: {
-    origin: '<http://localhost:4000>',
+    origin: '<https://localhost:4000>',
     methods: ['GET', 'POST'],
   },
 });
@@ -75,14 +75,11 @@ socketIO.use((socket, next) => {
   next();
 });
 
-app.get('/api', (req, res) => {
-  res.json(chatRooms);
-});
 app.get('/', (req, res) => {
   res.json({
     message: 'Hello world',
   });
 });
-http.listen(PORT, () => {
+https.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
