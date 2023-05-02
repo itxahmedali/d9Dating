@@ -4,37 +4,19 @@ const generateID = () => Math.random().toString(36).substring(2, 10);
 const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-const https = require('https').Server(app);
+const https = require('https').createServer(app);
 const cors = require('cors');
 app.use(cors());
 
 const socketIO = require('socket.io')(https, {
   cors: {
-    origin: '<https://localhost:4000>',
+    origin: 'http://192.168.18.226:3000',
     methods: ['GET', 'POST'],
   },
 });
 
-// socketIO.on('connection', (socket) => {
-//   console.log('A user connected');
-
-//   // Listen for the 'likePost' event from the client
-//   socket.on('likePost', ({ postId, userId }) => {
-//     console.log(`Post ${postId} was liked by user ${userId}`);
-//     const recipientIds = getRecipientIds(postId);
-//     sendLocalPushNotification(recipientIds, `${userId} liked your post!`);
-//   });
-
-//   // Handle Socket.IO disconnections
-//   socket.on('disconnect', () => {
-//     console.log('A user disconnected');
-//   });
-// });
-
-
 socketIO.on('connection', socket => {
   console.log(`⚡: ${socket.id} user just connected!`);
-  // socket.emit('roomsList', chatRooms);
   const users = [];
   for (let [id, socket] of socketIO.of('/').sockets) {
     users.push({
@@ -75,6 +57,9 @@ socketIO.use((socket, next) => {
   next();
 });
 
+app.get('/api', (req, res) => {
+  res.json(chatRooms);
+});
 app.get('/', (req, res) => {
   res.json({
     message: 'Hello world',
