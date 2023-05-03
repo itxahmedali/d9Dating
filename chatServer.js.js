@@ -1,25 +1,13 @@
 const express = require('express');
 const app = express();
+
+const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-const https = require('https').createServer(app);
+const https = require('https').Server(app);
 const cors = require('cors');
 app.use(cors());
 
-const normalizePort = val => {
-  const port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    return val;
-  }
-  if (port >= 0) {
-    return port;
-  }
-  return false;
-};
-const port = normalizePort(process.env.PORT || '3000');
-
-app.set('port', port);
 const socketIO = require('socket.io')(https, {
   cors: {
     origin: '<http://192.168.18.226:3000>',
@@ -29,6 +17,7 @@ const socketIO = require('socket.io')(https, {
 
 socketIO.on('connection', socket => {
   console.log(`⚡: ${socket.id} user just connected!`);
+  // socket.emit('roomsList', chatRooms);
   const users = [];
   for (let [id, socket] of socketIO.of('/').sockets) {
     users.push({
@@ -50,13 +39,12 @@ socketIO.on('connection', socket => {
       time: `${timestamp.hour}:${timestamp.mins}`,
     });
   });
- 
+
   socket.on('disconnect', () => {
     socket.disconnect();
     console.log('🔥: A user disconnected');
   });
 });
-
 
 socketIO.use((socket, next) => {
   const username = socket.handshake.auth.username;
@@ -74,6 +62,6 @@ app.get('/', (req, res) => {
     message: 'Hello world',
   });
 });
-https.listen(port, () => {
-  console.log(`Server listening on ${port}`);
+https.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
 });
