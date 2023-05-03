@@ -10,46 +10,44 @@ app.get("/*", function(req, res) {
   res.write(`<h1>Hello socket</h1> ${PORT}`)
   res.end
 });
-io.on('connection', socket => {
-  console.log(`⚡: ${socket.id} user just connected!`);
-  const users = [];
-  for (let [id, socket] of io.of('/').sockets) {
-    users.push({
-      userID: id,
-      username: socket.username,
-    });
-  }
-  io.emit('users', users);
-  console.log(users);
-  socket.broadcast.emit('user connected', {
-    userID: socket.id,
-    username: socket.username,
-  });
-  socket.on('private message', ({content, to, timestamp}) => {
-    console.log('sent,recieve', content, to);
-    socket.to(to).emit('private message', {
-      content,
-      from: socket.id,
-      time: `${timestamp.hour}:${timestamp.mins}`,
-    });
-  });
- 
+io.on('connection', (socket) => {
+  console.log("a user connected :D");
+        socket.on('message', (message) => {
+            const obj = JSON.stringify(message)
+            io.emit('message',`${obj}`);
+            socket.broadcast.to(message.recieverId).emit( 'message',`${obj}`);
+            console.log(message);
+        });
+//   socket.on('typing', ({user,status})=>{
+//     const obj = {status, user}
+//     io.emit('typing', obj)
+//     socket.broadcast.to(user).emit( 'typing',`${obj}`);
+//   })
+//   socket.on('notification', (noticondition, userData) => {
+//     const obj = JSON.stringify(noticondition)
+//     io.emit('notification',`${obj}`);
+//     socket.broadcast.to(userData).emit( 'notification',`${obj}`);
+//   });
+//   socket.on('call', (noticondition, userData) => {
+//     const obj = JSON.stringify(noticondition)
+//     io.emit('call',`${obj}`);
+//     socket.broadcast.to(userData).emit( 'call',`${obj}`);
+
+//   });
   socket.on('disconnect', () => {
-    socket.disconnect();
-    console.log('🔥: A user disconnected');
+    console.log('a user disconnected!');
   });
-});
+  // USER IS ONLINE
+//   socket.on("online", (userId) => {
+//     const obj = JSON.stringify(userId);
+//     io.emit('online',`${obj}`);
+// });
 
-
-io.use((socket, next) => {
-  const username = socket.handshake.auth.username;
-  console.log(socket.handshake.auth.username, 'server');
-
-  if (!username) {
-    return next(new Error('invalid username'));
-  }
-  socket.username = username;
-  next();
+// // USER IS OFFLINE
+// socket.on("offline", (userId) => {
+//   const obj = JSON.stringify(userId);
+//   io.emit('offline',`${obj}`);
+// });
 });
 
 const PORT = process.env.PORT || 3000;
