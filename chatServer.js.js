@@ -10,8 +10,7 @@ app.use(cors());
 
 const socketIO = require('socket.io')(https, {
   cors: {
-    origin: '<http://192.168.18.226:3000>',
-    methods: ['GET', 'POST'],
+    origin: 'https://d9dating.herokuapp.com',
   },
 });
 
