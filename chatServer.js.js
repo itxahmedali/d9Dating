@@ -15,8 +15,10 @@ const clients = new Map();
 
 // Handle new connections
 io.on('connection', (socket) => {
+  console.log('connected user: ', socket.id);
   // Handle new user joining the chat
   socket.on('join', (userId) => {
+    console.log('Join user: ', userId);
     // Authenticate the user (you can add your own authentication logic here)
 
     // Store the user's socket with their user ID
@@ -29,10 +31,11 @@ io.on('connection', (socket) => {
   // Handle incoming messages
   socket.on('message', (data) => {
     const { senderId, receiverId, message } = data;
-
+    console.log('User data : ', data);
     // Check if the receiver is connected and in the same room
     const receiverSocket = clients.get(receiverId);
     if (receiverSocket && receiverSocket.rooms.has(receiverId)) {
+      console.log('condition matched : ',receiverSocket, data);
       // Send the message to the receiver in the specified room
       receiverSocket.to(receiverId).emit('message', { senderId, message });
     } else {
