@@ -15,7 +15,7 @@ const clients = new Map();
 
 // Handle new connections
 io.on('connection', (socket) => {
-  console.log('connected user: ', socket.id);
+  console.log('connected user: ', socket);
   // Handle new user joining the chat
   socket.on('join', (userId) => {
     console.log('Join user: ', userId);
