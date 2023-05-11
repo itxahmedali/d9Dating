@@ -5,51 +5,44 @@ const http = require('http');
 const server = http.createServer(app);
 const socketio = require('socket.io');
 
-const io = socketio(server);
 app.get("/*", function(req, res) {
   res.write(`<h1>Hello socket</h1> ${PORT}`)
   res.end(); // <-- Corrected line
 });
+const io = socketio(server);
+const socketIdToUserIdMap = new Map();
+
 io.on('connection', socket => {
   console.log(`⚡: ${socket.id} user just connected!`);
-  const users = [];
-  for (let [id, socket] of io.of('/').sockets) {
-    users.push({
-      userID: id,
-      username: socket.username,
-    });
-  }
-  io.emit('users', users);
-  console.log(users);
-  socket.broadcast.emit('user connected', {
-    userID: socket.id,
-    username: socket.username,
+  
+  socket.on('login', ({ userId }) => {
+    // Store the mapping of socket ID to user ID
+    socketIdToUserIdMap.set(socket.id, userId);
+    console.log(`User ${userId} logged in.`);
   });
-  socket.on('private_message', ({content, to, timestamp}) => {
-    console.log('sent,recieve', content, to,socket.id);
-    socket.emit('private_message', {
-      content,
-      from: socket.id,
-      time: `${timestamp.hour}:${timestamp.mins}`,
-    });
-    console.log('emitted');
+
+  socket.on('private_message', ({ content, to }) => {
+    const fromUserId = socketIdToUserIdMap.get(socket.id);
+    const toSocketId = Array.from(socketIdToUserIdMap.entries())
+      .find(([_, userId]) => userId === to)?.[0];
+    
+    if (toSocketId) {
+      io.to(toSocketId).emit('private_message', {
+        content,
+        from: fromUserId,
+        time: new Date().toLocaleTimeString(),
+      });
+      console.log(`Private message sent from ${fromUserId} to ${to}.`);
+    } else {
+      console.log(`Invalid recipient: ${to}.`);
+    }
   });
- 
+
   socket.on('disconnect', () => {
-    socket.disconnect();
-    console.log('🔥: A user disconnected');
+    const disconnectedUserId = socketIdToUserIdMap.get(socket.id);
+    socketIdToUserIdMap.delete(socket.id);
+    console.log(`🔥: User ${disconnectedUserId} disconnected.`);
   });
-});
-
-io.use((socket, next) => {
-  const username = socket.handshake.auth.username;
-  console.log(socket.handshake.auth.username, 'server');
-
-  if (!username) {
-    return next(new Error('invalid username'));
-  }
-  socket.username = username;
-  next();
 });
 
 const PORT = process.env.PORT || 3000;
