@@ -32,6 +32,7 @@ io.on('connection', socket => {
       from: socket.id,
       time: `${timestamp.hour}:${timestamp.mins}`,
     });
+    console.log('emitted');
   });
  
   socket.on('disconnect', () => {
