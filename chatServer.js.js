@@ -25,14 +25,13 @@ io.on('connection', socket => {
     userID: socket.id,
     username: socket.username,
   });
-  socket.on('private_message', ({content, to, from, timestamp}) => {
+  socket.on('private_message', ({content, to, timestamp}) => {
     console.log('sent,recieve', content, to);
-    socket.emit('private_message', {
+    socket.to(to).emit('private_message', {
       content,
-      from: from,
+      from: socket.id,
       time: `${timestamp.hour}:${timestamp.mins}`,
     });
-    console.log('emitted');
   });
  
   socket.on('disconnect', () => {
