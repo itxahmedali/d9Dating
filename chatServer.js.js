@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -10,38 +9,47 @@ app.get("/*", function(req, res) {
   res.end(); // <-- Corrected line
 });
 const io = socketio(server);
-const socketIdToUserIdMap = new Map();
 
-io.on('connection', socket => {
-  console.log(`⚡: ${socket.id} user just connected!`);
-  
-  socket.on('login', ({ userId }) => {
-    // Store the mapping of socket ID to user ID
-    socketIdToUserIdMap.set(socket.id, userId);
-    console.log(`User ${userId} logged in.`);
+// Store connected clients
+const clients = new Map();
+
+// Handle new connections
+io.on('connection', (socket) => {
+  // Handle new user joining the chat
+  socket.on('join', (userId) => {
+    // Authenticate the user (you can add your own authentication logic here)
+
+    // Store the user's socket with their user ID
+    clients.set(userId, socket);
+
+    // Join a room based on the user ID
+    socket.join(userId);
   });
 
-  socket.on('private_message', ({ content, to }) => {
-    const fromUserId = socketIdToUserIdMap.get(socket.id);
-    const toSocketId = Array.from(socketIdToUserIdMap.entries())
-      .find(([_, userId]) => userId === to)?.[0];
-    
-    if (toSocketId) {
-      io.to(toSocketId).emit('private_message', {
-        content,
-        from: fromUserId,
-        time: new Date().toLocaleTimeString(),
-      });
-      console.log(`Private message sent from ${fromUserId} to ${to}.`);
+  // Handle incoming messages
+  socket.on('message', (data) => {
+    const { senderId, receiverId, message } = data;
+
+    // Check if the receiver is connected and in the same room
+    const receiverSocket = clients.get(receiverId);
+    if (receiverSocket && receiverSocket.rooms.has(receiverId)) {
+      // Send the message to the receiver in the specified room
+      receiverSocket.to(receiverId).emit('message', { senderId, message });
     } else {
-      console.log(`Invalid recipient: ${to}.`);
+      // Receiver is offline or not found
+      // You can handle this case accordingly
     }
   });
 
+  // Handle disconnections
   socket.on('disconnect', () => {
-    const disconnectedUserId = socketIdToUserIdMap.get(socket.id);
-    socketIdToUserIdMap.delete(socket.id);
-    console.log(`🔥: User ${disconnectedUserId} disconnected.`);
+    // Remove the user's socket from the clients map
+    for (const [userId, clientSocket] of clients.entries()) {
+      if (clientSocket === socket) {
+        clients.delete(userId);
+        break;
+      }
+    }
   });
 });
 
