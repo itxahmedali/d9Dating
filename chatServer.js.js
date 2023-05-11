@@ -15,9 +15,8 @@ app.get("/*", function (req, res) {
 io.on("connection", (socket) => {
   console.log("a user connected :D");
   socket.on("message", (message) => {
-    const obj = JSON.stringify(message);
-    io.emit("message", `${obj}`);
-    socket.emit("message", `${obj}`);
+    io.emit("message", message);
+    socket.emit("message", message);
     console.log(message);
   });
   socket.on("delete", (message) => {
