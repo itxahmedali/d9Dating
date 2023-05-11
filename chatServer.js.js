@@ -26,7 +26,7 @@ io.on('connection', socket => {
     username: socket.username,
   });
   socket.on('private_message', ({content, to, timestamp}) => {
-    console.log('sent,recieve', content, to);
+    console.log('sent,recieve', content, to,socket.id);
     socket.to(to).emit('private_message', {
       content,
       from: socket.id,
