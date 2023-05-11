@@ -1,4 +1,4 @@
-// const path = require('path');
+const path = require('path');
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -8,7 +8,7 @@ const socketio = require('socket.io');
 const io = socketio(server);
 app.get("/*", function(req, res) {
   res.write(`<h1>Hello socket</h1> ${PORT}`)
-  res.end
+  res.end(); // <-- Corrected line
 });
 io.on('connection', socket => {
   console.log(`⚡: ${socket.id} user just connected!`);
@@ -40,7 +40,6 @@ io.on('connection', socket => {
     console.log('🔥: A user disconnected');
   });
 });
-
 
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
