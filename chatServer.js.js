@@ -25,11 +25,11 @@ io.on('connection', socket => {
     userID: socket.id,
     username: socket.username,
   });
-  socket.on('private_message', ({content, to, timestamp}) => {
+  socket.on('private_message', ({content, to, from, timestamp}) => {
     console.log('sent,recieve', content, to);
     socket.emit('private_message', {
       content,
-      from: socket.id,
+      from: from,
       time: `${timestamp.hour}:${timestamp.mins}`,
     });
     console.log('emitted');
