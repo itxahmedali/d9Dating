@@ -33,9 +33,17 @@ io.on('connection', socket => {
     });
   });
  
-  socket.on('disconnect', () => {
+   socket.on('disconnect', () => {
     socket.disconnect();
-    console.log('🔥: A user disconnected');
+    const users = [];
+    for (let [id, socket] of socketIO.of('/').sockets) {
+      users.push({
+        userID: id,
+        username: socket.username,
+      });
+    }
+    io.emit('on_disconnect', users);
+    console.log('🔥: A user disconnected', users);
   });
 });
 
