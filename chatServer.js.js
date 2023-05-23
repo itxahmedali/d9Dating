@@ -42,7 +42,7 @@ io.on('connection', socket => {
         username: socket.username,
       });
     }
-    io.emit('on_disconnect', users);
+    io.emit('users', users);
     console.log('🔥: A user disconnected', users);
   });
 });
