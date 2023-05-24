@@ -35,14 +35,14 @@ io.on('connection', socket => {
  
    socket.on('disconnect', () => {
     socket.disconnect();
-//     const users = [];
-//     for (let [id, socket] of socketIO.of('/').sockets) {
-//       users.push({
-//         userID: id,
-//         username: socket.username,
-//       });
-//     }
- io.emit('user-disconnected', socket.id);
+    const users = [];
+    for (let [id, socket] of io.of('/').sockets) {
+      users.push({
+        userID: id,
+        username: socket.username,
+      });
+    }
+ io.emit('user-disconnected', users);
     console.log('🔥: A user disconnected', users);
   });
 });
