@@ -32,12 +32,11 @@ io.on('connection', socket => {
       time: `${timestamp.hour}:${timestamp.mins}`,
     });
   });
-    socket.on('like', ({username, to, timestamp}) => {
+    socket.on('like', ({username, to}) => {
     console.log('sent,recieve', username, to);
     socket.to(to).emit('like', {
-      username,
+      username:username,
       from: socket.id,
-      time: `${timestamp.hour}:${timestamp.mins}`,
     });
   });
  
