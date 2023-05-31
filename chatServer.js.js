@@ -56,6 +56,15 @@ io.on("connection", (socket) => {
     });
     console.log("sent,recieve", postId, postUserId, myId);
   });
+  socket.on("message", ({ from, to,  message, time }) => {
+    io.emit("message", {
+      from: from,
+      to: to,
+      message: message,
+      time:time
+    });
+    console.log("sent,recieve", from, to,  message,time);
+  });
   socket.on("disconnect", () => {
     socket.disconnect();
     const users = [];
