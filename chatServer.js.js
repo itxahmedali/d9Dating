@@ -34,13 +34,28 @@ io.on("connection", (socket) => {
   });
   socket.on("like", ({ postId, postUserId, myId }) => {
     io.emit("like", {
-      postId:postId,
+      postId: postId,
       postUserId: postUserId,
-      myId: myId
+      myId: myId,
     });
     console.log("sent,recieve", postUserId, myId);
   });
-
+  socket.on("request", ({ from, to, type }) => {
+    io.emit("request", {
+      from: from,
+      to: to,
+      type: type,
+    });
+    console.log("sent,recieve", from, to, type);
+  });
+  socket.on("comment", ({ postId, postUserId,  myId }) => {
+    io.emit("comment", {
+      postId: postId,
+      postUserId: postUserId,
+      myId: myId,
+    });
+    console.log("sent,recieve", postId, postUserId, myId);
+  });
   socket.on("disconnect", () => {
     socket.disconnect();
     const users = [];
