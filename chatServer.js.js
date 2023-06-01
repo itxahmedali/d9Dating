@@ -56,14 +56,15 @@ io.on("connection", (socket) => {
     });
     console.log("sent,recieve", postId, postUserId, myId);
   });
-  socket.on("message", ({ from, to,  message, time }) => {
+  socket.on("message", ({ from, to,  message, time,socketUniqueId }) => {
     io.emit("message", {
       from: from,
       to: to,
       message: message,
-      time:time
+      time:time,
+      socketUniqueId:socketUniqueId
     });
-    console.log("messageing recivieng sending", from, to,  message,time);
+    console.log("messageing recivieng sending", from, to,  message,time, socketUniqueId);
   });
   socket.on("disconnect", () => {
     socket.disconnect();
