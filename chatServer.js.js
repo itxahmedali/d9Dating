@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
       message: message,
       time:time
     });
-    console.log("sent,recieve", from, to,  message,time);
+    console.log("messageing recivieng sending", from, to,  message,time);
   });
   socket.on("disconnect", () => {
     socket.disconnect();
