@@ -56,6 +56,14 @@ io.on("connection", (socket) => {
     });
     console.log("sent,recieve", postId, postUserId, myId);
   });
+  socket.on("commentDelete", ({ postId, postUserId,  myId }) => {
+    io.emit("commentDelete", {
+      postId: postId,
+      postUserId: postUserId,
+      myId: myId,
+    });
+    console.log("sent,recieve", postId, postUserId, myId);
+  });
   socket.on("message", ({ from, to,  message, time,socketUniqueId }) => {
     io.emit("message", {
       from: from,
