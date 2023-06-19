@@ -11,19 +11,6 @@ app.get("/*", function (req, res) {
 });
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
-  const users = [];
-  for (let [id, socket] of io.of("/").sockets) {
-    users.push({
-      userID: id,
-      username: socket.username,
-    });
-  }
-  io.emit("users", users);
-  console.log(users);
-  socket.broadcast.emit("user connected", {
-    userID: socket.id,
-    username: socket.username,
-  });
   socket.on("private_message", ({ content, to, timestamp }) => {
     console.log("sent,recieve", content, to);
     socket.to(to).emit("private_message", {
@@ -76,27 +63,8 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", () => {
     socket.disconnect();
-    const users = [];
-    for (let [id, socket] of io.of("/").sockets) {
-      users.push({
-        userID: id,
-        username: socket.username,
-      });
-    }
-    io.emit("user-disconnected", users);
-    console.log("🔥: A user disconnected", users);
+    console.log("🔥: A user disconnected");
   });
-});
-
-io.use((socket, next) => {
-  const username = socket.handshake.auth.username;
-  console.log(socket.handshake.auth.username, "server");
-
-  if (!username) {
-    return next(new Error("invalid username"));
-  }
-  socket.username = username;
-  next();
 });
 
 const PORT = process.env.PORT || 3000;
