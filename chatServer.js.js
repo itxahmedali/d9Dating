@@ -19,13 +19,14 @@ io.on("connection", (socket) => {
       time: `${timestamp.hour}:${timestamp.mins}`,
     });
   });
-  socket.on("like", ({ postId, postUserId, myId }) => {
+  socket.on("like", ({ postId, postUserId, myId, type }) => {
     io.emit("like", {
       postId: postId,
       postUserId: postUserId,
       myId: myId,
+      type:type
     });
-    console.log("sent,recieve", postUserId, myId);
+    console.log("sent,recieve", postUserId, myId, type);
   });
   socket.on("request", ({ from, to, type }) => {
     io.emit("request", {
